@@ -2,12 +2,16 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.xml
   def index
+    @products_count = Product.where(build_conds).count
     @products = Product.where(build_conds).order("#{params[:sort]} #{params[:order]}").paginate(:per_page => params[:rows], :page => params[:page])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @products }
-      format.json  { render :json => @products.map{|i| {:id => i.id, :code => i.code, :name => i.name, :category => i.category.try(:name)}}.to_json }
+      format.json  {
+        h = {:total => @products_count, :rows => @products.map{|i| {:id => i.id, :code => i.code, :name => i.name, :category => i.category.try(:name)}}}
+        render :json => h.to_json
+      }
     end
   end
 

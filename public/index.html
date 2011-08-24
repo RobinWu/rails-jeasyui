@@ -18,7 +18,7 @@
             function add() {
                 win.window('open');
                 form.form('clear');
-                form.url = 'Handler.ashx?action=save';
+                form.url = '/products';
             }
             function remove_product() {
                 var rows = $('#test').datagrid('getSelections');
@@ -40,6 +40,14 @@
             }
             function closeSearchWindow() {
                 searchWin.window('close');
+            }
+            function saveData() {
+                var node = $('#tt2').tree('getSelected');
+                $.post("/products", {'product[code]': $("#new_code").val(), 'product[name]': $("#new_name").val(), 'product[category_id]': (node == null ? '' : node.id)}).complete(
+                function(){ grid.datagrid('reload'); win.window('close'); });
+            }
+            function closeWindow() {
+                win.window('close');
             }
 
             $(function(){
@@ -89,12 +97,12 @@
                     remoteSort: false,
                     idField:'code',
                     frozenColumns:[[
-                      {field:'ck',checkbox:true},
-                      {title:'code',field:'code',width:80,sortable:true}
+                    {field:'ck',checkbox:true},
+                    {title:'code',field:'code',width:80,sortable:true}
                     ]],
                     columns:[[
-                      {field:'name',title:'Name',width:120},
-                      {field:'category',title:'Category',width:120}
+                    {field:'name',title:'Name',width:120},
+                    {field:'category',title:'Category',width:120}
                     ]],
                     pagination:true,
                     rownumbers:true,
@@ -113,14 +121,9 @@
                         text: '查找',
                         iconCls: 'icon-search',
                         handler: OpensearchWin
-                        }]
+                    }]
                 });
                 var p = $('#test').datagrid('getPager');
-                $(p).pagination({
-                    onBeforeRefresh:function(){
-                        alert('before refresh');
-                    }
-                });
             });
             function collapse(){
                 var node = $('#tt2').tree('getSelected');
@@ -134,20 +137,20 @@
                 var node = $('#tt2').tree('getSelected');
                 var new_name = prompt("新类名","");
                 $.post("/categories", {'category[name]': new_name, 'category[parent_id]': node.id}).complete(
-                    function(){ $('#tt2').tree('reload'); });
+                function(){ $('#tt2').tree('reload'); });
             }
             function remove(){
                 var node = $('#tt2').tree('getSelected');
                 $.ajax({url: "/categories/" + node.id, type: 'DELETE', success: function(msg){
-                  $('#tt2').tree('remove', node.target);
+                        $('#tt2').tree('remove', node.target);
                 }});
             }
             function update(){
                 var node = $('#tt2').tree('getSelected');
                 var new_name = prompt("新类名", node.text);
                 $.ajax({url: "/categories/" + node.id, type: 'PUT', data: "category[name]=" + new_name , success: function(msg){
-                    node.text = new_name;
-                    $('#tt2').tree('update', node);
+                        node.text = new_name;
+                        $('#tt2').tree('update', node);
                 }});
             }
         </script>
@@ -176,10 +179,18 @@
                     <table>
                         <tr>
                             <td>
-                                名称：
+                                code：
                             </td>
                             <td>
-                                <input name="title" style="width: 150px;" />
+                                <input name="params[:code]" style="width: 150px;" id="new_code" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                name：
+                            </td>
+                            <td>
+                                <input name="params[:name]" style="width: 150px;" id="new_name"/>
                             </td>
                         </tr>
                     </table>
