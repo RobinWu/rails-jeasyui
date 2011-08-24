@@ -6,6 +6,8 @@
         <link rel="stylesheet" type="text/css" href="stylesheets/themes/icon.css">
         <script type="text/javascript" src="javascripts/jquery-1.6.min.js"></script>
         <script type="text/javascript" src="javascripts/jquery.easyui.min.js"></script>
+        <meta name="csrf-param" content="authenticity_token"/>
+        <meta name="csrf-token" content="DVVCdDZQYUgJzwHaZ8fnewISzRiNVuszeT5+14sGmug="/>
         <script>
             var grid;
             var win;
@@ -18,11 +20,32 @@
                 form.form('clear');
                 form.url = 'Handler.ashx?action=save';
             }
+            function remove_product() {
+                var rows = $('#test').datagrid('getSelections');
+                for(var i=0;i<rows.length;i++){
+                    $.ajax({url: "/products/" + rows[i].id, type: 'DELETE', success: function(msg){
+                            $('#test').datagrid('reload');
+                    }});
+                }
+            }
+            function OpensearchWin() {
+                searchWin.window('open');
+                searchForm.form('clear');
+            }
+            function SearchOK() {
+                var s_title = $("#s_title").val();
+                searchWin.window('close');
+                var node = $('#tt2').tree('getSelected');
+                $('#test').datagrid('reload', {search : s_title, cid : (node == null ? '' : node.id)});
+            }
+            function closeSearchWindow() {
+                searchWin.window('close');
+            }
 
             $(function(){
                 $('#tt2').tree({
                     checkbox: false,
-                    method: 'get',
+                    method: 'Get',
                     url: '/categories.json',
                     onClick:function(node){
                         //$(this).tree('toggle', node.target);
@@ -85,13 +108,12 @@
                         }, '-', {
                         text: '删除',
                         iconCls: 'icon-remove',
+                        handler: remove_product
                         }, '-', {
                         text: '查找',
                         iconCls: 'icon-search',
-                        }, '-', {
-                        text: '所有',
-                        iconCls: 'icon-search',
-                    }]
+                        handler: OpensearchWin
+                        }]
                 });
                 var p = $('#test').datagrid('getPager');
                 $(p).pagination({
@@ -175,7 +197,7 @@
                     <table>
                         <tr>
                             <td>
-                                名称：
+                                搜索：
                             </td>
                             <td>
                                 <input name="s_title" id="s_title" style="width: 150px;" />

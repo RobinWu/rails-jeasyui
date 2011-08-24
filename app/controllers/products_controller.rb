@@ -2,9 +2,7 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.xml
   def index
-    conds = nil
-    conds = {:category_id => params[:cid]} unless params[:cid].blank?
-    @products = Product.where(conds).order("#{params[:sort]} #{params[:order]}").paginate(:per_page => params[:rows], :page => params[:page])
+    @products = Product.where(build_conds).order("#{params[:sort]} #{params[:order]}").paginate(:per_page => params[:rows], :page => params[:page])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -82,5 +80,19 @@ class ProductsController < ApplicationController
       format.html { redirect_to(products_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def build_conds
+    conds = []; pars = {}
+    unless params[:cid].blank?
+      conds << "category_id = :cid"
+      pars[:cid] = params[:cid]
+    end
+    unless params[:search].blank?
+      conds << "(code LIKE :quick OR name LIKE :quick)"
+      pars[:quick] = "%#{params[:search]}%"
+    end
+
+    [conds.join(' AND '), pars]
   end
 end
