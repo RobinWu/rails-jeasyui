@@ -7,7 +7,7 @@ class CategoriesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @categories }
-      format.json { render :json => Category.to_tree_json }
+      format.json { render :json => params[:id].blank? ? Category.to_tree_json : Category.find(params[:id]).to_tree_json }
     end
   end
 
