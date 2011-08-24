@@ -1,0 +1,11 @@
+# Requirement
+
+  http://jquery.com/
+  http://jeasyui.com/
+
+# css & js
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/themes/icon.css">
+    <script type="text/javascript" src="javascripts/jquery-1.6.min.js"></script>
+    <script type="text/javascript" src="javascripts/jquery.easyui.min.js"></script>
